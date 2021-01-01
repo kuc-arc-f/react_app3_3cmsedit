@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import { HashRouter as Router, Route } from 'react-router-dom';
 
 import Navbar from './component/Layouts/Navbar';
+import Foot from './component/Layouts/Foot';
+
 import About from './component/About';
 import Home from './component/Home';
 // import Test from './component/Test';
@@ -57,9 +59,7 @@ class App extends Component {
             <Route path='/cms_category' component={CmsCategoryIndex}/>
             <Route path='/cms_category_create' component={CmsCategoryCreate}/>
             <Route path='/cms_category_edit/:id' component={CmsCategoryEdit}/>
-            
-            
-            
+            <Foot />
           </div>
         </Router>
       </div>

@@ -3,23 +3,30 @@ import { Link } from 'react-router-dom';
 import IndexRow from './IndexRow';
 import firebase from 'firebase'
 import LibCmsPosts from '../../../libs/LibCmsPosts';
+import LibPaginate from '../../../libs/LibPaginate';
 
 //
 class Index extends Component {
     constructor(props) {
         super(props);
-        this.state = {data: ''}
+        this.state = {data: '', pagenate_display:0 }
         this.db = null
+        this.page = 1
+        this.handleClickPagenate = this.handleClickPagenate.bind(this);
+        this.handleClickPagenateP1 = this.handleClickPagenateP1.bind(this);
     }
     componentDidMount(){
         this.get_items()        
     }
     async get_items(){
+        LibPaginate.init();
+        var page_info = LibPaginate.get_page_start(this.page);         
+console.log(page_info)        
         var items = []
         var self = this
         this.database = firebase.firestore()
         var dbRef = this.database.collection('cms_posts')
-        dbRef = dbRef.orderBy("created_at", "desc")
+        dbRef = dbRef.orderBy("created_at", "desc").limit(page_info.limit)
         var querySnapshot = await dbRef.get()
         querySnapshot.forEach(function(doc) {
             var item = doc.data()
@@ -31,10 +38,12 @@ class Index extends Component {
                 category_id: item.category_id,
             })            
         })
+        items = LibPaginate.get_page_items(items, page_info.start , page_info.limit )
         var categories = await LibCmsPosts.get_category_items(firebase)
         items = LibCmsPosts.get_post_items(items , categories)
-// console.log( d )
-        self.setState({ data: items })
+// console.log( items )
+        var is_paginate = LibPaginate.is_paging_display(items.length)
+        self.setState({ data: items, pagenate_display: is_paginate })
     }
     tabRow(){
         if(this.state.data instanceof Array){
@@ -43,6 +52,32 @@ class Index extends Component {
             })
         }
     }
+    handleClickPagenateP1(){
+        this.page = 1
+        this.get_items()
+    }
+    handleClickPagenate(){
+        var page = this.page
+        this.page = page + 1
+        console.log( "page=", this.page )
+        this.get_items()
+    }    
+    dispPagenate(){
+        if(this.state.pagenate_display ===1){
+            return(
+            <div className="paginate_wrap">
+                <div className="btn-group" role="group" aria-label="Basic example">
+                    <button onClick={this.handleClickPagenateP1} className="btn btn-lg btn-outline-primary">
+                        1st
+                    </button>
+                    <button onClick={this.handleClickPagenate} className="btn btn-lg btn-outline-primary">
+                        >
+                    </button>
+                </div>
+            </div>
+            )
+        }
+    }    
     render(){
         return (
         <div className="container">
@@ -68,6 +103,9 @@ class Index extends Component {
                     {this.tabRow()}
                 </tbody>
             </table>
+            <hr />
+            {this.dispPagenate()}   
+            <br /><br />         
         </div>
         )
     }
