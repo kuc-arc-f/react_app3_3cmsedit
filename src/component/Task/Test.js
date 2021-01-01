@@ -55,12 +55,47 @@ class Test extends Component {
             return false
         } 
     }
-    handleClick(){
+    // test_date
+    async test_get(){
+        try{
+            var items = []
+            this.database = firebase.firestore()
+            var dbRef = this.database.collection('tasks')
+            dbRef = dbRef.orderBy("created_at", "desc").limit(10)
+            var querySnapshot = await dbRef.get()
+            querySnapshot.forEach(function(doc) {
+                var item = doc.data()
+                items.push(item)            
+            })
+// console.log(items)
+            return items
+            /*
+            var items = []
+            this.database = firebase.firestore()
+            var dbRef = this.database.collection('cms_pages')
+            dbRef = dbRef.orderBy("created_at", "desc")
+            dbRef.get().then(function(querySnapshot) {
+                querySnapshot.forEach(function(doc) {
+                    var item = doc.data()
+                    items.push(item)            
+                })
+console.log( items )
+            })            
+            */
+        } catch (e) {
+            console.error(e);
+            console.error("error, test_get");
+            return false
+        } 
+    }    
+    async handleClick(){
 console.log("#-handleClick")
+        var d = await this.test_get()
+/*
         for(var i=0; i< 5; i++){
-//            this.add_item(i+1)
             this.add_post_item(i+1)
         }
+*/
 console.log("#-handleClick-End")
     }
     render() {

@@ -43,7 +43,7 @@ console.log(page_info)
             items = LibPaginate.get_page_items(items, page_info.start , page_info.limit )
             var is_paginate = LibPaginate.is_paging_display(items.length)
             self.setState({ data: items, pagenate_display: is_paginate })
-//console.log( items )
+console.log( items )
         })        
     }
     tabRow(){
